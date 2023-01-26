@@ -51,3 +51,49 @@ This solution is an AWS Lambda function which checks the expiration date of an S
   *The SSL certificate for expired.badssl.com has expired or is not valid.*
 
 ## Deployment
+
+Deployment with terraform plans configure external resources like API Gateway, Lambda Function etc.
+
+# REQUIREMENTS
+
+* [Terraform](https://www.terraform.io)
+* [AWS cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+
+# LINT
+
+```console
+$ cd terraform
+$ terraform init
+$ terraform plan
+```
+
+Note that Terraform modules have known bugs concerning validation logic. Linting with `terraform plan` can help to catch many errors early in development, perhaps 60% of errors. The remaining 40% will be caught at deployment time with `terraform apply`.
+
+# PROVISION
+
+```console
+$ export AWS_ACCESS_KEY_ID="..."
+$ export AWS_SECRET_ACCESS_KEY="..."
+$ terraform apply [-auto-approve]
+```
+**Important!!!**
+
+Update the code to the actual SNS Topic ARN in Lambda function and redeploy.
+
+`topic_arn = "arn:aws:sns:<region>:<account_id>:ssl-updates"`
+
+# Testing
+
+In order to test create a test event from a template **API Gateway AWS Proxy**.
+
+![Alt text](/images/test-event-creation.png?raw=true "Test Event Creation")
+
+After selecting the template it will give to an interface to test the lambda function then you have to update the path in payload below.
+
+From: `"/path/to/resource"`
+
+To: `"/ssl/check/example.com"`
+
+After update hit test button and check the response as given below:
+
+![Alt text](/images/test-event-response.png?raw=true "Test Event Response")

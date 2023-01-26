@@ -31,13 +31,13 @@ def check_ssl_expiration(domain_name):
 
 
 def lambda_handler(event, context):
-    domain_name = event["pathParameters"]["domain_name"]
+    domain_name = event["pathParameters"]["proxy"]
     result = check_ssl_expiration(domain_name)
     if not result["is_valid"]:
         # publish message to SNS topic
         sns = boto3.client("sns")
         # SNS topic ARN
-        topic_arn = "arn:aws:sns:<region>:<account_id>:<topic_name>"
+        topic_arn = "arn:aws:sns:<region>:<account_id>:ssl-updates"
         message = f"The SSL certificate for {domain_name} has expired or is not valid."
         sns.publish(TopicArn=topic_arn, Message=message)
     return {"statusCode": 200, "body": json.dumps(result)}
